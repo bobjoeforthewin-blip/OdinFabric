@@ -24,7 +24,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.PlayerFaceRenderer
 import net.minecraft.network.protocol.game.ClientboundMapItemDataPacket
 import java.awt.Color as AwtColor
-//a
+//as
 object DungeonMap : Module(
     name = "Dungeon Map",
     description = "Customizable dungeon map with room colors, door colors, and player names."
@@ -66,12 +66,16 @@ object DungeonMap : Module(
     var rareRoomColor by ColorSetting("Rare Room", Color(255, 203, 89), false, desc = "Color of rare rooms.").withDependency { roomDropdown }
 
     private val mapHud by HUD("Dungeon Map", "Displays the dungeon map with customizable colors.", false) { example ->
-        when {
-            DungeonUtils.openRoomCount == 0 && !example -> 0 to 0
-            example -> renderExampleMap()
-            else -> renderDungeonMap()
-        }
+    when {
+        example -> renderExampleMap()
+
+        // Only hide if we literally have no data yet
+        MapScanner.allRooms.isEmpty() && MapScanner.doors.isEmpty() -> 0 to 0
+
+        else -> renderDungeonMap()
     }
+}
+
 
     private fun GuiGraphics.renderExampleMap(): Pair<Int, Int> {
         val roomsX = 116
