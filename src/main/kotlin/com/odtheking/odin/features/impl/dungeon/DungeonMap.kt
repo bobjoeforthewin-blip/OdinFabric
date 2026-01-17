@@ -102,17 +102,22 @@ object DungeonMap : Module(
         matrices.translate(backgroundSize, backgroundSize)
 
         for (room in MapScanner.allRooms.values) {
-            if (room.state == RoomState.UNDISCOVERED || room.state == RoomState.UNOPENED) continue
+            // keep skipping truly unknown rooms, but draw unopened ones
+            if (room.state == RoomState.UNDISCOVERED) continue
+
             for (tile in room.tiles) renderTile(tile)
         }
 
         for (door in MapScanner.doors) {
-            if (!door.seen) continue
+            // show layout pre-start too
             renderTile(door)
+
+            // if a door connects to unopened rooms, still draw those tiles
             for (roomTile in door.rooms) {
-                if (roomTile.owner.state == RoomState.UNOPENED) renderTile(roomTile)
+                renderTile(roomTile)
             }
         }
+
 
         val fontHeight = mc.font.lineHeight
         val textFactor = 1 / textScaling
